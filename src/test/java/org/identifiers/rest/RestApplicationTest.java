@@ -64,6 +64,20 @@ public class RestApplicationTest {
                 .andExpect(jsonPath("prefix", equalTo("pubmed")));
     }
 
+    /*
+    * TODO: testing with h2, the value is case sensitive.
+    * TODO: This works fine with mysql ie:not case sensitive.
+    * TODO: pub would return the same results
+    */
+    @Test
+    public void testCollectionName() throws Exception {
+        this.mvc.perform(
+                get("/collections/name/Pub"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name", equalTo("PubMed")))
+                .andExpect(jsonPath("$[0].prefix", equalTo("pubmed")));
+    }
+
     @Test
     public void testResource() throws Exception {
         this.mvc.perform(

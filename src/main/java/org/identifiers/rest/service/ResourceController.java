@@ -33,6 +33,9 @@ public class ResourceController {
     @Autowired
     ResourceService resourceService;
 
+    /*
+    * Returns the resource information for a given id
+    */
     @RequestMapping(value="/{resourceId}",method= RequestMethod.GET)
     public @ResponseBody
     ResourceSummery getResource(@PathVariable String resourceId) {

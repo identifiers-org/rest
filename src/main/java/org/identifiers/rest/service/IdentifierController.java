@@ -44,6 +44,9 @@ public class IdentifierController {
     @Autowired
     CollectionService collectionService;
 
+    /*
+    * Returns a list of valid prefixes for a given identifier
+    */
     @RequestMapping(value="/{id}",method= RequestMethod.GET)
     public @ResponseBody
     List<IdentifierSummary> getValidIdentifiers(@PathVariable String id) {
@@ -63,7 +66,9 @@ public class IdentifierController {
         return identifierSummaries;
     }
 
-    // TODO: 21/09/2016  - change hardcoded uris
+    /*
+    * Validate the given {prefix}:{identifier} scheme.
+    * */
     @RequestMapping(value="/validate/{id}",method= RequestMethod.GET)
     public @ResponseBody IdentifierSummary getValidCollection(@PathVariable String id) {
 
@@ -88,10 +93,16 @@ public class IdentifierController {
         return null;
     }
 
+    /*
+    *checks for regular expression
+    */
     private Boolean checkRegexp(String element, String pattern) {
         return element != null && pattern != null && Pattern.matches(pattern, element);
     }
 
+    /*
+    * Pings the url to see whether it responds
+    */
     private Boolean pingURL(String url_string){
         try {
             URL url = new URL(url_string);
