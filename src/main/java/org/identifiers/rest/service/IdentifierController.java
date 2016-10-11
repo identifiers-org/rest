@@ -76,7 +76,7 @@ public class IdentifierController {
             entity = id;
         }
         if (checkRegexp(entity, collection.getPattern())) {
-            if(pingURL("http://dev.identifiers.org/"+id)){
+            if(pingURL(configProperties.getHttp()+id)){
                 IdentifierSummary identifierSummary = new IdentifierSummary();
                 identifierSummary.setPrefix(prefix);
                 identifierSummary.setIdentifier(entity);
@@ -88,15 +88,8 @@ public class IdentifierController {
         return null;
     }
 
-    private Boolean checkRegexp(String element, String pattern){
-        if ((null != element) && (! element.isEmpty()) && (null != pattern) && (! pattern.isEmpty())){
-            Pattern pat = Pattern.compile(pattern);
-            Matcher matcher = pat.matcher(element);
-            return matcher.matches();
-        }
-        else{
-            return false;
-        }
+    private Boolean checkRegexp(String element, String pattern) {
+        return element != null && pattern != null && Pattern.matches(pattern, element);
     }
 
     private Boolean pingURL(String url_string){

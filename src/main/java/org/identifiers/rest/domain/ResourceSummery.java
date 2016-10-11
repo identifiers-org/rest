@@ -31,7 +31,7 @@ public class ResourceSummery {
         institution=resource.getInstitution();
         location=resource.getLocation();
         official=resource.getOfficial()==1 ? true: false;
-        resourcePrefix=resource.getResourcePrefix().isEmpty() ? null : resource.getResourcePrefix();
+        resourcePrefix=resource.getResourcePrefix() !=null && !resource.getResourcePrefix().isEmpty() ? resource.getResourcePrefix() : null;
     }
 
     public String getId() {
