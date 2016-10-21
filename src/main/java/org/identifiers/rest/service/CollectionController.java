@@ -37,7 +37,6 @@ import java.util.regex.Pattern;
 @RequestMapping("/collections")
 @Configuration
 @ComponentScan("org.identifiers.jpa")
-@EnableAutoConfiguration
 public class CollectionController {
 
     @Autowired

@@ -33,7 +33,6 @@ import java.util.regex.Pattern;
 @RequestMapping("/identifiers")
 @Configuration
 @ComponentScan("org.identifiers.jpa")
-@EnableAutoConfiguration
 public class IdentifierController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());

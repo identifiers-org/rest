@@ -26,7 +26,6 @@ import java.util.List;
 @RequestMapping("/resources")
 @Configuration
 @ComponentScan("org.identifiers.jpa")
-@EnableAutoConfiguration
 public class ResourceController {
 
     @Autowired
