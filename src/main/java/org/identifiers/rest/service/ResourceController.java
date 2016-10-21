@@ -27,7 +27,6 @@ import java.util.List;
 @Configuration
 @ComponentScan("org.identifiers.jpa")
 @EnableAutoConfiguration
-@EnableJpaRepositories("org.identifiers.jpa")
 public class ResourceController {
 
     @Autowired

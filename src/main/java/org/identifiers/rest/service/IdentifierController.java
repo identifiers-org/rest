@@ -5,6 +5,8 @@ import org.identifiers.jpa.domain.Collection;
 import org.identifiers.jpa.service.CollectionService;
 import org.identifiers.jpa.service.PrefixService;
 import org.identifiers.rest.domain.IdentifierSummary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
@@ -32,8 +34,9 @@ import java.util.regex.Pattern;
 @Configuration
 @ComponentScan("org.identifiers.jpa")
 @EnableAutoConfiguration
-@EnableJpaRepositories("org.identifiers.jpa")
 public class IdentifierController {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     PrefixService prefixService;
@@ -50,20 +53,54 @@ public class IdentifierController {
     @RequestMapping(value="/{id}",method= RequestMethod.GET)
     public @ResponseBody
     List<IdentifierSummary> getValidIdentifiers(@PathVariable String id) {
+        List<IdentifierSummary> identifierSummaries = new ArrayList<>();
+        IdentifierSummary identifierSummary;
+        try {
+            identifierSummary = createIdentifierSummaryFromId(id);
+            if (identifierSummary != null) {
+                identifierSummaries.add(identifierSummary);
+                return identifierSummaries;
+            }
+        }catch (IllegalArgumentException e){
+            logger.debug("Not a prefixed identifier.");
+        }
 
         List<Collection> collections = collectionService.findNonObsolete();
-        List<IdentifierSummary> identifierSummaries = new ArrayList<>();
+
         for (Collection collection:collections){
             if (checkRegexp(id, collection.getPattern())) {
-                IdentifierSummary identifierSummary = new IdentifierSummary();
+                identifierSummary = new IdentifierSummary();
                 identifierSummary.setPrefix(prefixService.findPrefixString(collection));
                 identifierSummary.setIdentifier(id);
-                identifierSummary.setUrl(configProperties.getHttp()+id);
+                identifierSummary.setUrl(configProperties.getHttp()+identifierSummary.getPrefix()+":"+id);
                 identifierSummaries.add(identifierSummary);
-
             }
         }
         return identifierSummaries;
+    }
+
+    private IdentifierSummary createIdentifierSummaryFromId(String id){
+        if(!id.contains(":")){
+            throw new IllegalArgumentException("Required {prefix}:{identifier}");
+        }
+        String prefix = id.substring(0,id.indexOf(":"));
+        String entity = id.substring(id.indexOf(":")+1);
+
+        Collection collection = prefixService.findPrefix(prefix).getCollection();
+
+        if(collection==null){
+            throw new IllegalArgumentException("Unknown prefix");
+        }
+
+        if (collection.getPrefixedId()==1) {
+            entity = id;
+        }
+        if (checkRegexp(entity, collection.getPattern())) {
+            return new IdentifierSummary(prefix,entity,configProperties.getHttp()+id);
+        }else{
+            throw new IllegalArgumentException("Invalid identifier pattern");
+        }
+
     }
 
     /*
@@ -72,25 +109,14 @@ public class IdentifierController {
     @RequestMapping(value="/validate/{id}",method= RequestMethod.GET)
     public @ResponseBody IdentifierSummary getValidCollection(@PathVariable String id) {
 
-        String prefix = id.substring(0,id.indexOf(":"));
-        String entity = id.substring(id.indexOf(":")+1);
+        IdentifierSummary identifierSummary = createIdentifierSummaryFromId(id);
 
-        Collection collection = prefixService.findPrefix(prefix).getCollection();
-
-        if (collection.getPrefixedId()==1) {
-            entity = id;
+        if (identifierSummary != null && pingURL(identifierSummary.getUrl())) {
+            return identifierSummary;
         }
-        if (checkRegexp(entity, collection.getPattern())) {
-            if(pingURL(configProperties.getHttp()+id)){
-                IdentifierSummary identifierSummary = new IdentifierSummary();
-                identifierSummary.setPrefix(prefix);
-                identifierSummary.setIdentifier(entity);
-                identifierSummary.setUrl(configProperties.getHttp()+id);
-                return identifierSummary;
-            }
+        else {
+            throw new IllegalArgumentException("Unable to reach the data record, resource may be down");
         }
-
-        return null;
     }
 
     /*

@@ -38,7 +38,6 @@ import java.util.regex.Pattern;
 @Configuration
 @ComponentScan("org.identifiers.jpa")
 @EnableAutoConfiguration
-@EnableJpaRepositories("org.identifiers.jpa")
 public class CollectionController {
 
     @Autowired

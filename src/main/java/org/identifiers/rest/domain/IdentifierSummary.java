@@ -11,6 +11,15 @@ public class IdentifierSummary {
     private String identifier;
     private String url;
 
+    public IdentifierSummary() {
+    }
+
+    public IdentifierSummary(String prefix, String identifier, String url) {
+        this.prefix = prefix;
+        this.identifier = identifier;
+        this.url = url;
+    }
+
     public String getPrefix() {
         return prefix;
     }
