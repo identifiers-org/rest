@@ -3,7 +3,6 @@ package org.identifiers.rest.domain;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.identifiers.jpa.domain.Collection;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

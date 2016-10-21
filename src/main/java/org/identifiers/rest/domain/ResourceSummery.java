@@ -30,7 +30,7 @@ public class ResourceSummery {
         info=resource.getInfo();
         institution=resource.getInstitution();
         location=resource.getLocation();
-        official=resource.getOfficial()==1 ? true: false;
+        official= resource.getOfficial() == 1;
         resourcePrefix=resource.getResourcePrefix() !=null && !resource.getResourcePrefix().isEmpty() ? resource.getResourcePrefix() : null;
     }
 

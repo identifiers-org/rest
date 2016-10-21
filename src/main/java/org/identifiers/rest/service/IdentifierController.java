@@ -8,10 +8,8 @@ import org.identifiers.rest.domain.IdentifierSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +21,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -31,8 +28,6 @@ import java.util.regex.Pattern;
  */
 @Controller
 @RequestMapping("/identifiers")
-@Configuration
-@ComponentScan("org.identifiers.jpa")
 public class IdentifierController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());

@@ -2,31 +2,23 @@ package org.identifiers.rest.service;
 
 import org.identifiers.jpa.ConfigProperties;
 import org.identifiers.jpa.domain.Collection;
-import org.identifiers.jpa.domain.Prefix;
 import org.identifiers.jpa.domain.Resource;
-import org.identifiers.jpa.service.*;
+import org.identifiers.jpa.service.CollectionService;
+import org.identifiers.jpa.service.PrefixService;
+import org.identifiers.jpa.service.ResourceService;
 import org.identifiers.rest.domain.CollectionSummary;
 import org.identifiers.rest.domain.ResourceSummery;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 /**
@@ -35,8 +27,6 @@ import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("/collections")
-@Configuration
-@ComponentScan("org.identifiers.jpa")
 public class CollectionController {
 
     @Autowired
