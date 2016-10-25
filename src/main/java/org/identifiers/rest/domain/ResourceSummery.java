@@ -2,6 +2,8 @@ package org.identifiers.rest.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.identifiers.jpa.domain.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by sarala on 30/09/2016.
@@ -10,21 +12,18 @@ import org.identifiers.jpa.domain.Resource;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResourceSummery {
 
+    private static final Logger logger = LoggerFactory.getLogger(ResourceSummery.class);
+
     private String id;
-
     private String accessURL;
-
     private String info;
-
     private String institution;
-
     private String location;
-
     private boolean official;
-
     private String resourcePrefix;
 
     public ResourceSummery(Resource resource) {
+        logger.info("Creating resouce summary for "+resource.getId());
         id=resource.getId();
         accessURL=resource.getUrlPrefix()+"$id"+resource.getUrlSuffix();
         info=resource.getInfo();

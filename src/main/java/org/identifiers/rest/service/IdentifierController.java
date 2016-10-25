@@ -8,8 +8,6 @@ import org.identifiers.rest.domain.IdentifierSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +28,7 @@ import java.util.regex.Pattern;
 @RequestMapping("/identifiers")
 public class IdentifierController {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(IdentifierController.class);
 
     @Autowired
     PrefixService prefixService;
@@ -56,18 +54,22 @@ public class IdentifierController {
                 return identifierSummaries;
             }
         }catch (IllegalArgumentException e){
-            logger.debug("Not a prefixed identifier.");
+            logger.info("Not a prefixed identifier.");
         }
 
         List<Collection> collections = collectionService.findNonObsolete();
+        logger.info("Number of collections found "+collections.size());
 
         for (Collection collection:collections){
             if (checkRegexp(id, collection.getPattern())) {
+                logger.info("Pattern matched "+ id + " " + collection.getPattern());
                 identifierSummary = new IdentifierSummary();
                 identifierSummary.setPrefix(prefixService.findPrefixString(collection));
                 identifierSummary.setIdentifier(id);
                 identifierSummary.setUrl(configProperties.getHttp()+identifierSummary.getPrefix()+":"+id);
                 identifierSummaries.add(identifierSummary);
+            }else{
+                logger.info("Pattern not matched "+ id + " " + collection.getPattern());
             }
         }
         return identifierSummaries;
@@ -86,10 +88,19 @@ public class IdentifierController {
             throw new IllegalArgumentException("Unknown prefix");
         }
 
+        logger.info("Collection found "+ collection.getName());
+
         if (collection.getPrefixedId()==1) {
-            entity = id;
+            //try uppercase identifier as this is commonly used
+            entity = prefix.toUpperCase()+":"+entity;
+            if (checkRegexp(entity, collection.getPattern())) {
+                return new IdentifierSummary(prefix,entity,configProperties.getHttp()+entity);
+            }else{
+                entity = id;
+            }
         }
         if (checkRegexp(entity, collection.getPattern())) {
+            logger.info("Pattern matched "+ id + " " + collection.getPattern());
             return new IdentifierSummary(prefix,entity,configProperties.getHttp()+id);
         }else{
             throw new IllegalArgumentException("Invalid identifier pattern");
@@ -126,16 +137,19 @@ public class IdentifierController {
     private Boolean pingURL(String url_string){
         try {
             URL url = new URL(url_string);
+            logger.info("Ping url "+ url_string);
             HttpURLConnection connection = (HttpURLConnection)url.openConnection();
             connection.setRequestMethod("HEAD");
             connection.setConnectTimeout(200);
             int code = connection.getResponseCode();
             if(code >=200 && code<400) {
+                logger.info("Ping successful");
                 return true;
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        logger.info("Ping successful for "+ url_string);
         return false;
     }
 }

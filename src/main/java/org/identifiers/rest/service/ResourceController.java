@@ -3,6 +3,8 @@ package org.identifiers.rest.service;
 import org.identifiers.jpa.domain.Resource;
 import org.identifiers.jpa.service.ResourceService;
 import org.identifiers.rest.domain.ResourceSummery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -31,9 +33,11 @@ public class ResourceController {
     public @ResponseBody
     ResourceSummery getResource(@PathVariable String resourceId) {
         Resource resource = resourceService.findNonObsoleteResource(resourceId);
+        if(resource == null){
+            throw new IllegalArgumentException("Required {prefix}:{identifier}");
+        }
 
         ResourceSummery resourceSummery = new ResourceSummery(resource);
-
         return resourceSummery;
     }
 }

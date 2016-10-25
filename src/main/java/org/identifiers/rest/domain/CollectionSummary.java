@@ -2,6 +2,8 @@ package org.identifiers.rest.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.identifiers.jpa.domain.Collection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -10,6 +12,8 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CollectionSummary{
+
+    private static final Logger logger = LoggerFactory.getLogger(CollectionSummary.class);
 
     private String id;
     private String name;
@@ -21,6 +25,7 @@ public class CollectionSummary{
 
 
     public CollectionSummary(Collection collection) {
+        logger.info("Creating collection summary for "+collection.getId());
         id = collection.getId();
         name = collection.getName();
         pattern = collection.getPattern();

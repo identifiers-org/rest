@@ -8,6 +8,8 @@ import org.identifiers.jpa.service.PrefixService;
 import org.identifiers.jpa.service.ResourceService;
 import org.identifiers.rest.domain.CollectionSummary;
 import org.identifiers.rest.domain.ResourceSummery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +31,8 @@ import java.util.List;
 @RequestMapping("/collections")
 public class CollectionController {
 
+    private static final Logger logger = LoggerFactory.getLogger(CollectionController.class);
+
     @Autowired
     PrefixService prefixService;
 
@@ -48,6 +52,7 @@ public class CollectionController {
     @RequestMapping(method= RequestMethod.GET)
     public @ResponseBody List<CollectionSummary> getCollections() {
         List<Collection> collections = collectionService.findNonObsolete();
+        logger.info("Number of collections found "+collections.size());
         return setPrefixes(collections);
     }
 
@@ -57,7 +62,15 @@ public class CollectionController {
     @RequestMapping(value="/{collectionId}",method= RequestMethod.GET)
     public @ResponseBody CollectionSummary getCollection(@PathVariable String collectionId) {
         Collection collection = collectionService.findById(collectionId);
+
+        if(collection==null){
+            throw new IllegalArgumentException("Invalid collection identifier " + collectionId);
+        }
+        logger.info("Collection found "+collection.getId());
+
         List<Resource> resources = resourceService.findNonObsoleteResources(collection);
+        logger.info("Number of resources found "+resources.size());
+
 
         List<ResourceSummery> resourceSummeries = new ArrayList<>();
         for (Resource resource: resources) {
@@ -78,6 +91,11 @@ public class CollectionController {
     @RequestMapping(value="/name/{name}",method= RequestMethod.GET)
     public @ResponseBody List<CollectionSummary> getCollectionsSimilarTo(@PathVariable String name) {
         List<Collection> collections = collectionService.findCollections(name);
+        if(collections.isEmpty()){
+            throw new IllegalArgumentException("Collection not found: " + name);
+        }
+        logger.info("Number of collections found "+collections.size() + " by name " + name);
+
         return setPrefixes(collections);
     }
 
@@ -93,11 +111,5 @@ public class CollectionController {
             collectionSummeries.add(collectionSummary);
         }
         return collectionSummeries;
-
     }
-
-
-
-
-
 }

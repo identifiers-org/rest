@@ -1,12 +1,16 @@
 package org.identifiers.rest.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by sarala on 04/10/2016.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class IdentifierSummary {
+
+    private static final Logger logger = LoggerFactory.getLogger(IdentifierSummary.class);
     private String prefix;
     private String identifier;
     private String url;
@@ -15,6 +19,7 @@ public class IdentifierSummary {
     }
 
     public IdentifierSummary(String prefix, String identifier, String url) {
+        logger.info("Creating identifier summary for "+prefix + ":"+ identifier);
         this.prefix = prefix;
         this.identifier = identifier;
         this.url = url;
