@@ -2,6 +2,7 @@ package org.identifiers.rest.service;
 
 import org.identifiers.jpa.ConfigProperties;
 import org.identifiers.jpa.domain.Collection;
+import org.identifiers.jpa.domain.Prefix;
 import org.identifiers.jpa.service.CollectionService;
 import org.identifiers.jpa.service.PrefixService;
 import org.identifiers.rest.domain.IdentifierSummary;
@@ -79,29 +80,31 @@ public class IdentifierController {
         if(!id.contains(":")){
             throw new IllegalArgumentException("Required {prefix}:{identifier}");
         }
-        String prefix = id.substring(0,id.indexOf(":"));
+        String prefixString = id.substring(0,id.indexOf(":"));
         String entity = id.substring(id.indexOf(":")+1);
 
-        Collection collection = prefixService.findPrefix(prefix).getCollection();
+        Prefix prefix = prefixService.findPrefix(prefixString);
 
-        if(collection==null){
+        if(prefix==null){
             throw new IllegalArgumentException("Unknown prefix");
         }
+
+        Collection collection = prefix.getCollection();
 
         logger.info("Collection found "+ collection.getName());
 
         if (collection.getPrefixedId()==1) {
             //try uppercase identifier as this is commonly used
-            entity = prefix.toUpperCase()+":"+entity;
+            entity = prefixString.toUpperCase()+":"+entity;
             if (checkRegexp(entity, collection.getPattern())) {
-                return new IdentifierSummary(prefix,entity,configProperties.getHttp()+entity);
+                return new IdentifierSummary(prefixString,entity,configProperties.getHttp()+entity);
             }else{
                 entity = id;
             }
         }
         if (checkRegexp(entity, collection.getPattern())) {
             logger.info("Pattern matched "+ id + " " + collection.getPattern());
-            return new IdentifierSummary(prefix,entity,configProperties.getHttp()+id);
+            return new IdentifierSummary(prefixString,entity,configProperties.getHttp()+id);
         }else{
             throw new IllegalArgumentException("Invalid identifier pattern");
         }
