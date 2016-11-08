@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -49,7 +50,7 @@ public class CollectionController {
     */
     @RequestMapping(method= RequestMethod.GET)
     public @ResponseBody List<CollectionSummary> getCollections() {
-        List<Collection> collections = collectionService.findNonObsolete();
+        Set<Collection> collections = collectionService.findNonObsolete();
         logger.info("Number of collections found "+collections.size());
         return setPrefixes(collections);
     }
@@ -88,7 +89,7 @@ public class CollectionController {
     */
     @RequestMapping(value="/name/{name}",method= RequestMethod.GET)
     public @ResponseBody List<CollectionSummary> getCollectionsSimilarTo(@PathVariable String name) {
-        List<Collection> collections = collectionService.findCollections(name);
+        Set<Collection> collections = collectionService.findByNameAndPrefixContaining(name);
         if(collections.isEmpty()){
             throw new IllegalArgumentException("Collection not found: " + name);
         }
@@ -100,7 +101,7 @@ public class CollectionController {
     /*
     * Populates prefixes for a given list of collections
     */
-    private List<CollectionSummary> setPrefixes(List<Collection> collections){
+    private List<CollectionSummary> setPrefixes(Set<Collection> collections){
         List<CollectionSummary> collectionSummeries = new ArrayList<>();
         for (Collection collection: collections) {
             CollectionSummary collectionSummary = new CollectionSummary(collection);

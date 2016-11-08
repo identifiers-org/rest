@@ -9,6 +9,9 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+
 /**
  * Created by sarala on 29/09/2016.
  */
@@ -25,12 +28,19 @@ public class RestApplication extends SpringBootServletInitializer {
     }
 
     public static void main(String[] args) {
+        SpringApplication.run(RestApplication.class, args);
+    }
+
+    @Override
+    public void onStartup(ServletContext servletContext) throws ServletException {
         String datacenter = System.getenv("DATACENTRE");
         if(datacenter!=null){
             System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, datacenter);
+        }else{
+            System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, "hx");
         }
         logger.info("Rest service running in " + datacenter);
-        SpringApplication.run(RestApplication.class, args);
+        super.onStartup(servletContext);
     }
 
 }

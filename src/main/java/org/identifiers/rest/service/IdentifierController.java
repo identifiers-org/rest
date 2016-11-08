@@ -20,6 +20,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -58,7 +59,7 @@ public class IdentifierController {
             logger.info("Not a prefixed identifier.");
         }
 
-        List<Collection> collections = collectionService.findNonObsolete();
+        Set<Collection> collections = collectionService.findNonObsolete();
         logger.info("Number of collections found "+collections.size());
 
         for (Collection collection:collections){
