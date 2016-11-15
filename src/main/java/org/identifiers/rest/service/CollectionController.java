@@ -2,6 +2,7 @@ package org.identifiers.rest.service;
 
 import org.identifiers.jpa.ConfigProperties;
 import org.identifiers.jpa.domain.Collection;
+import org.identifiers.jpa.domain.Prefix;
 import org.identifiers.jpa.domain.Resource;
 import org.identifiers.jpa.service.CollectionService;
 import org.identifiers.jpa.service.PrefixService;
@@ -97,6 +98,36 @@ public class CollectionController {
 
         return setPrefixes(collections);
     }
+
+    /*
+    * Returns a list of provider codes for a matching collection using the namespace prefix.
+    */
+    @RequestMapping(value="/provider/{nsprefix}",method= RequestMethod.GET)
+    public @ResponseBody List<ResourceSummery> getProviderCodes(@PathVariable String nsprefix) {
+        Prefix prefix = prefixService.findPrefix(nsprefix);
+        if(prefix==null){
+            throw new IllegalArgumentException("Prefix does not exist: " + nsprefix);
+        }
+        logger.info("Prefix found by name " + nsprefix);
+
+        List<Resource> resources = resourceService.findNonObsoleteResources(prefix.getCollection());
+
+        if(resources.isEmpty()){
+            throw new IllegalArgumentException("Resources not found for prefix: " + nsprefix);
+        }
+        logger.info("Number of resources found "+resources.size() + " for prefix " + nsprefix);
+
+        List<ResourceSummery> resourceSummeries = new ArrayList<>();
+        for (Resource resource: resources) {
+            if(!resource.getResourcePrefix().isEmpty()) {
+                ResourceSummery resourceSummery = new ResourceSummery(resource);
+                resourceSummeries.add(resourceSummery);
+            }
+        }
+
+        return resourceSummeries;
+    }
+
 
     /*
     * Populates prefixes for a given list of collections
