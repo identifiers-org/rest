@@ -22,6 +22,7 @@ public class CollectionSummary{
     private String prefix;
     private String url;
     private List<ResourceSummery> resources;
+    private List<String> synonyms;
 
 
     public CollectionSummary(Collection collection) {
@@ -86,5 +87,13 @@ public class CollectionSummary{
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public List<String> getSynonyms() {
+        return synonyms;
+    }
+
+    public void setSynonyms(List<String> synonyms) {
+        this.synonyms = synonyms;
     }
 }

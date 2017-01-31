@@ -4,9 +4,11 @@ import org.identifiers.jpa.ConfigProperties;
 import org.identifiers.jpa.domain.Collection;
 import org.identifiers.jpa.domain.Prefix;
 import org.identifiers.jpa.domain.Resource;
+import org.identifiers.jpa.domain.Synonym;
 import org.identifiers.jpa.service.CollectionService;
 import org.identifiers.jpa.service.PrefixService;
 import org.identifiers.jpa.service.ResourceService;
+import org.identifiers.jpa.service.SynonymService;
 import org.identifiers.rest.domain.CollectionSummary;
 import org.identifiers.rest.domain.ResourceSummery;
 import org.slf4j.Logger;
@@ -38,6 +40,9 @@ public class CollectionController {
 
     @Autowired
     CollectionService collectionService;
+
+    @Autowired
+    SynonymService synonymService;
 
     @Autowired
     ResourceService resourceService;
@@ -82,6 +87,7 @@ public class CollectionController {
         collectionSummary.setPrefix(prefixService.findPrefixString(collection));
         collectionSummary.setUrl(prefixService.findIdentifiersUrl(collectionSummary.getPrefix(),configProperties));
         collectionSummary.setResources(resourceSummeries);
+        setSynonyms(collection,collectionSummary);
         return collectionSummary;
     }
 
@@ -138,8 +144,18 @@ public class CollectionController {
             CollectionSummary collectionSummary = new CollectionSummary(collection);
             collectionSummary.setPrefix(prefixService.findPrefixString(collection));
             collectionSummary.setUrl(prefixService.findIdentifiersUrl(collectionSummary.getPrefix(),configProperties));
+            setSynonyms(collection,collectionSummary);
             collectionSummeries.add(collectionSummary);
         }
         return collectionSummeries;
+    }
+
+    private void setSynonyms(Collection collection, CollectionSummary collectionSummary){
+        List<String> synonyms = new ArrayList<>();
+        for(Synonym synonym : synonymService.findSynonyms(collection)){
+            synonyms.add(synonym.getName());
+        }
+        if(!synonyms.isEmpty())
+            collectionSummary.setSynonyms(synonyms);
     }
 }
