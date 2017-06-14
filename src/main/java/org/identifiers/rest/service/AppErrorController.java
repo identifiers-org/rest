@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.web.ErrorAttributes;
 import org.springframework.boot.autoconfigure.web.ErrorController;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -27,10 +29,11 @@ public class AppErrorController implements ErrorController {
     private ErrorAttributes errorAttributes;
 
     @RequestMapping(value = PATH)
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
     ErrorJson error(HttpServletRequest request, HttpServletResponse response) {
         // Appropriate HTTP response code (e.g. 404 or 500) is automatically set by Spring.
         // Here we just define response body.
-        return new ErrorJson(response.getStatus(), getErrorAttributes(request, true));
+        return new ErrorJson(getErrorAttributes(request, true));
     }
 
     @Override
@@ -45,22 +48,13 @@ public class AppErrorController implements ErrorController {
 
     public class ErrorJson {
 
-        public Integer status;
         public String message;
         public String timeStamp;
 
-        public ErrorJson(int status, Map<String, Object> errorAttributes) {
-
-            if(errorAttributes.get("exception").equals("java.lang.IllegalArgumentException")) {
-                this.status = 404;
-            }else{
-                this.status = status;
-            }
-
-
+        public ErrorJson(Map<String, Object> errorAttributes) {
             this.message = (String) errorAttributes.get("message");
             this.timeStamp = errorAttributes.get("timestamp").toString();
-          // this.trace = (String) errorAttributes.get("trace");
+
         }
 
     }
