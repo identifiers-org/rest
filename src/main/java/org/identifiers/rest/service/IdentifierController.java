@@ -124,7 +124,7 @@ public class IdentifierController {
             return identifierSummary;
         }
         else {
-            throw new IllegalArgumentException("Unable to reach the data record, resource may be down");
+            throw new IllegalArgumentException("Unable to reach the data record");
         }
     }
 
