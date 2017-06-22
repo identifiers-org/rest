@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -140,20 +141,30 @@ public class IdentifierController {
     */
     private Boolean pingURL(String url_string){
         try {
-            URL url = new URL(url_string);
-            logger.info("Ping url "+ url_string);
+            String finalDestination = getFinalURL(url_string);
+            URL url = new URL(finalDestination);
             HttpURLConnection connection = (HttpURLConnection)url.openConnection();
             connection.setRequestMethod("HEAD");
             connection.setConnectTimeout(200);
             int code = connection.getResponseCode();
             if(code >=200 && code<400) {
-                logger.info("Ping successful");
+                logger.info("Ping successful for "+ finalDestination);
                 return true;
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        logger.info("Ping successful for "+ url_string);
+
         return false;
+    }
+
+    private String getFinalURL(String url_string) throws IOException {
+        URL url= new URL(url_string);
+        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        connection.setInstanceFollowRedirects(true);
+        String location = connection.getHeaderField("location");
+        if(location==null)
+            location = url_string;
+        return location;
     }
 }
