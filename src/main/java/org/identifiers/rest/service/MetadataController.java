@@ -32,8 +32,8 @@ public class MetadataController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public @ResponseBody
-    String getMetadata(@PathVariable String id) {
-        String data = null;
+    Object getMetadata(@PathVariable String id) {
+        Object data = null;
         try {
             Document doc = Jsoup.connect("http://identifiers.org/"+id).get();
             Elements scripts = doc.select("script");
@@ -42,7 +42,7 @@ public class MetadataController {
                     Object jsonObject = JsonUtils.fromString(element.data());
                     String context = ((Map)jsonObject).get("@context").toString();
                     if(context!=null && !context.isEmpty() && context.contains("http://schema.org")){
-                        data = element.data();
+                        data = jsonObject; //element.data();
                         break;
                     }
                 }
