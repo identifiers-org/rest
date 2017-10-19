@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
  * Created by sarala on 30/09/2016.
  */
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ResourceSummery {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourceSummery.class);
@@ -21,16 +21,19 @@ public class ResourceSummery {
     private String location;
     private boolean official;
     private String resourcePrefix;
+    private String localId;
+    private String testString;
 
     public ResourceSummery(Resource resource) {
         logger.info("Creating resouce summary for "+resource.getId());
         id=resource.getId();
-        accessURL=resource.getUrlPrefix()+"$id"+resource.getUrlSuffix();
+        accessURL=resource.getUrlPrefix()+"{$id}"+resource.getUrlSuffix();
         info=resource.getInfo();
         institution=resource.getInstitution();
         location=resource.getLocation();
         official= resource.getOfficial() == 1;
         resourcePrefix=resource.getResourcePrefix() !=null && !resource.getResourcePrefix().isEmpty() ? resource.getResourcePrefix() : null;
+        localId=resource.getExample();
     }
 
     public String getId() {
@@ -87,5 +90,21 @@ public class ResourceSummery {
 
     public void setResourcePrefix(String resourcePrefix) {
         this.resourcePrefix = resourcePrefix;
+    }
+
+    public String getLocalId() {
+        return localId;
+    }
+
+    public void setLocalId(String localId) {
+        this.localId = localId;
+    }
+
+    public String getTestString() {
+        return testString;
+    }
+
+    public void setTestString(String testString) {
+        this.testString = testString;
     }
 }

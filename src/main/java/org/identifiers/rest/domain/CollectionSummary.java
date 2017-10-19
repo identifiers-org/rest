@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by sarala on 29/09/2016.
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class CollectionSummary{
 
     private static final Logger logger = LoggerFactory.getLogger(CollectionSummary.class);
@@ -21,9 +21,9 @@ public class CollectionSummary{
     private String definition;
     private String prefix;
     private String url;
-    private List<ResourceSummery> resources;
     private List<String> synonyms;
-
+    private int prefixed;
+    private List<ResourceSummery> resources;
 
     public CollectionSummary(Collection collection) {
         logger.info("Creating collection summary for "+collection.getId());
@@ -31,6 +31,7 @@ public class CollectionSummary{
         name = collection.getName();
         pattern = collection.getPattern();
         definition = collection.getDefinition();
+        prefixed = collection.getPrefixedId();
     }
 
     public String getId() {
@@ -95,5 +96,13 @@ public class CollectionSummary{
 
     public void setSynonyms(List<String> synonyms) {
         this.synonyms = synonyms;
+    }
+
+    public int getPrefixed() {
+        return prefixed;
+    }
+
+    public void setPrefixed(int prefixed) {
+        this.prefixed = prefixed;
     }
 }

@@ -1,14 +1,8 @@
 package org.identifiers.rest.service;
 
 import org.identifiers.jpa.ConfigProperties;
-import org.identifiers.jpa.domain.Collection;
-import org.identifiers.jpa.domain.Prefix;
-import org.identifiers.jpa.domain.Resource;
-import org.identifiers.jpa.domain.Synonym;
-import org.identifiers.jpa.service.CollectionService;
-import org.identifiers.jpa.service.PrefixService;
-import org.identifiers.jpa.service.ResourceService;
-import org.identifiers.jpa.service.SynonymService;
+import org.identifiers.jpa.domain.*;
+import org.identifiers.jpa.service.*;
 import org.identifiers.rest.domain.CollectionSummary;
 import org.identifiers.rest.domain.ResourceSummery;
 import org.slf4j.Logger;
@@ -50,6 +44,8 @@ public class CollectionController {
     @Autowired
     ConfigProperties configProperties;
 
+    @Autowired
+    StatisticsService statisticsService;
 
     /*
     * Returns all nonobsolete collections ie.(obsolete flag set to '0')
@@ -59,6 +55,49 @@ public class CollectionController {
         Set<Collection> collections = collectionService.findNonObsolete();
         logger.info("Number of collections found "+collections.size());
         return setPrefixes(collections);
+    }
+
+    /*
+    * Returns a dump of the regiry that is imported to AWS
+    */
+    @RequestMapping(value="/expand",method= RequestMethod.GET)
+    public @ResponseBody List<CollectionSummary> getExpandedCollections() {
+        ArrayList<CollectionSummary> collectionSummaries = new ArrayList<>();
+        Set<Collection> collections = collectionService.findNonObsolete();
+        logger.info("Number of collections found "+collections.size());
+
+        for(Collection collection: collections){
+            List<Resource> resources = resourceService.findNonObsoleteResources(collection);
+            logger.info("Number of resources found "+resources.size());
+
+
+            List<ResourceSummery> resourceSummeries = new ArrayList<>();
+            for (Resource resource: resources) {
+                ResourceSummery resourceSummery = new ResourceSummery(resource);
+                resourceSummery.setTestString(statisticsService.findKeyword(resource));
+
+                String localId=resource.getExample();
+                String accessURL=resource.getUrlPrefix();
+                if(collection.getPrefixedId()==1){
+                    int colonPos = localId.indexOf(":");
+                    accessURL = accessURL + localId.substring(0,colonPos+1)+"{$id}"+resource.getUrlSuffix();
+                    resourceSummery.setAccessURL(accessURL);
+
+                    localId = localId.substring(colonPos+1);
+                    resourceSummery.setLocalId(localId);
+                }
+
+                resourceSummeries.add(resourceSummery);
+            }
+
+            CollectionSummary collectionSummary = new CollectionSummary(collection);
+            collectionSummary.setPrefix(prefixService.findPrefixString(collection));
+            collectionSummary.setUrl(prefixService.findIdentifiersUrl(collectionSummary.getPrefix(),configProperties));
+            collectionSummary.setResources(resourceSummeries);
+            setSynonyms(collection,collectionSummary);
+            collectionSummaries.add(collectionSummary);
+        }
+        return collectionSummaries;
     }
 
     /*

@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by sarala on 04/10/2016.
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class IdentifierSummary {
 
     private static final Logger logger = LoggerFactory.getLogger(IdentifierSummary.class);
