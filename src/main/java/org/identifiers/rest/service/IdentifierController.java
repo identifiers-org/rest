@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.HandlerMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -116,12 +118,16 @@ public class IdentifierController {
     /*
     * Validate the given {prefix}:{identifier} scheme.
     * */
-    @RequestMapping(value="/validate/{id}",method= RequestMethod.GET)
-    public @ResponseBody IdentifierSummary getValidCollection(@PathVariable String id) {
+    @RequestMapping(value="/validate/**",method= RequestMethod.GET)
+    public @ResponseBody IdentifierSummary getValidCollection(HttpServletRequest request) {
+        //path variable was not working for dois as there were `/` in the identifier
+        String id = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        id = id.substring(22);
+        System.out.println(id);
 
         IdentifierSummary identifierSummary = createIdentifierSummaryFromId(id);
 
-        if (identifierSummary != null && pingURL(identifierSummary.getUrl())) {
+        if (identifierSummary != null /*&& pingURL(identifierSummary.getUrl())*/) {
             return identifierSummary;
         }
         else {
@@ -142,6 +148,7 @@ public class IdentifierController {
     private Boolean pingURL(String url_string){
         try {
             String finalDestination = getFinalURL(url_string);
+            logger.info("Ping location: "+finalDestination);
             URL url = new URL(finalDestination);
             HttpURLConnection connection = (HttpURLConnection)url.openConnection();
             connection.setRequestMethod("HEAD");
@@ -164,7 +171,7 @@ public class IdentifierController {
         connection.setInstanceFollowRedirects(true);
         String location = connection.getHeaderField("location");
         if(location==null)
-            location = url_string;
+            location = connection.getURL().toString();
         return location;
     }
 }

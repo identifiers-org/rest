@@ -5,6 +5,7 @@ import org.identifiers.jpa.domain.*;
 import org.identifiers.jpa.service.*;
 import org.identifiers.rest.domain.CollectionSummary;
 import org.identifiers.rest.domain.ResourceSummery;
+import org.identifiers.rest.domain.UpdateSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -173,6 +174,16 @@ public class CollectionController {
         return resourceSummeries;
     }
 
+    @RequestMapping(value="/summary",method= RequestMethod.GET)
+    public @ResponseBody UpdateSummary getUpdateSummary() {
+        UpdateSummary updateSummary = new UpdateSummary();
+        updateSummary.setCollections(collectionService.countByNonObsolete());
+        updateSummary.setLastModifiedDate(collectionService.findLastModifiedDate().getModified());
+        updateSummary.setResources(resourceService.countByNonObsolete());
+        logger.info("Update summary created");
+
+        return updateSummary;
+    }
 
     /*
     * Populates prefixes for a given list of collections
@@ -197,4 +208,6 @@ public class CollectionController {
         if(!synonyms.isEmpty())
             collectionSummary.setSynonyms(synonyms);
     }
+
+
 }
